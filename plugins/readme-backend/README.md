@@ -38,12 +38,14 @@ This plugin does not require any configuration. It has a default configuration
 with a set of README file names that it will look for in the entity source location. This actual file to use and the order to look for them can be
 configured in the `app-config.yaml` file using the "readme.fileNames" configuration key. This is a simple list of file names to look for in the entity source location.
 
+Optionally, you can also provide a time period for the plugin to cache each readme via the "readme.cacheTTLHours" configuration key. This should be a number value specifying the amount of hours. This value defaults to 1 hour.
 ```yaml
 readme:
   -fileNames:
     - README.txt
     - README.text
     - README.markdown
+  cacheTTLHours: 3
 ```
 
 ### Troubleshooting

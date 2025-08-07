@@ -2,6 +2,7 @@ import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
 import {
   AuthService,
   CacheService,
+  CacheServiceSetOptions,
   DiscoveryService,
   LoggerService,
   RootConfigService,
@@ -42,6 +43,9 @@ export async function createRouter(
 ): Promise<express.Router> {
   const { auth, logger, config, reader, discovery, cache } = options;
   const catalogClient = new CatalogClient({ discoveryApi: discovery });
+
+  const configCacheTTLHours = config.getOptionalNumber('readme.cacheTTLHours');
+  const cacheTTL: CacheServiceSetOptions = { ttl: { hours: configCacheTTLHours ?? 1 } };
 
   logger.info('Initializing readme backend');
   const integrations = ScmIntegrations.fromConfig(config);
@@ -125,7 +129,7 @@ export async function createRouter(
           name: fileType.name,
           type: fileType.type,
           content: content,
-        });
+        }, cacheTTL);
         logger.info(
           `Found README for ${entityRef}: ${url} type ${fileType.type}`,
         );
@@ -147,7 +151,7 @@ export async function createRouter(
       name: NOT_FOUND_PLACEHOLDER,
       type: '',
       content: '',
-    });
+    }, cacheTTL);
     throw new NotFoundError('Readme could not be found');
   });
 
